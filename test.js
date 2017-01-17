@@ -24,7 +24,7 @@ console.log(data);
 
 
 /******************* test array *******************/
-var paramsObj = new $PF.Params([{
+var paramsObj = new $PF.Params({
   name: $PF.DT.STRING,
   age: $PF.DT.NUMBER,
   favs: $PF.DT.ARRAY,
@@ -32,7 +32,7 @@ var paramsObj = new $PF.Params([{
     address: $PF.DT.STRING,
     phone: $PF.DT.NUMBER
   })
-}]);
+});
 
 var data = paramsObj.filter([{
   name: 'frank',
