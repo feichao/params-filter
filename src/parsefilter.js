@@ -1,4 +1,4 @@
-(function(global) {
+(function () {
   'use strict';
 
   var ParamsUtil = {};
@@ -12,30 +12,37 @@
     OBJECT: 'object'
   };
 
-  ParamsUtil.isNumber = function(p) {
+  ParamsUtil.isNumber = function (p) {
     return typeof p === 'number';
   };
 
-  ParamsUtil.isString = function(p) {
+  ParamsUtil.isString = function (p) {
     return typeof p === 'string';
   };
 
-  ParamsUtil.isBoolean = function(p) {
+  ParamsUtil.isBoolean = function (p) {
     return typeof p === 'boolean';
   };
 
   ParamsUtil.isArray = Array.isArray;
 
-  ParamsUtil.isObject = function(p) {
-    return typeof p === 'object';
+  ParamsUtil.isObject = function (p) {
+    return typeof p === 'object' && !ParamsUtil.isArray(p);
   };
 
   function Params(params, options) {
     this.params = params;
   }
 
-  Params.prototype.filter = function(data) {
-  	if (ParamsUtil.isArray(this.params) && ParamsUtil.isArray(data)) {
+  Params.prototype.filter = function (data) {
+    if (ParamsUtil.isObject(this.params) && ParamsUtil.isArray(data)) {
+      var params = this.params;
+      return data.map(function(d) {
+        return filterObject(params, d, {});
+      });
+    }
+
+    if (ParamsUtil.isArray(this.params) && ParamsUtil.isArray(data)) {
       return filterArray(this.params, data, []);
     }
 
@@ -60,33 +67,27 @@
   }
 
   function filterArray(params, data, result) {
-    if (params.length === data.length) {
-      result = data.map(function(d, index) {
-      	if(params[index] instanceof Params) {
-      		return Params.prototype.filter.call(params[index], d);
-      	} else {
-      		return filterOthers(params[index], d);
-      	}
-      });
-    } else {
-      result = data.map(function(d) {
-        return filterObject(params[0], d, {});
-      });
-    }
+    result = data.map(function (d, index) {
+      if (params[index] instanceof Params) {
+        return Params.prototype.filter.call(params[index], d);
+      } else {
+        return filterOthers(params[index], d);
+      }
+    });
 
     return result;
   }
 
   function filterOthers(params, data) {
-  	if (ParamsUtil.isArray(params)) {
+    if (ParamsUtil.isArray(params)) {
       return filterArray(params, data, []);
     }
 
-  	if(ParamsUtil.isObject(params)) {
-  		return filterObject(params, data, {});
-  	}
+    if (ParamsUtil.isObject(params)) {
+      return filterObject(params, data, {});
+    }
 
-  	return getLeftParams(params, data);
+    return getLeftParams(params, data);
   }
 
   function getLeftParams(pValue, dValue) {
@@ -106,49 +107,16 @@
     }
   }
 
-  global.$PF = global.ParamsFilter = {
+  var g;
+  try {
+    g = window;
+  } catch(e) {
+    g = global;
+  }
+
+  g.$PF = g.ParamsFilter = {
     Params: Params,
     DT: ParamsUtil.DATA_TYPE
   };
 
-})(global);
-
-var paramsObj = new $PF.Params([{
-  name: $PF.DT.STRING,
-  age: $PF.DT.NUMBER,
-  favs: $PF.DT.ARRAY,
-  others: new $PF.Params({
-    address: $PF.DT.STRING,
-    phone: $PF.DT.NUMBER
-  })
-}, {
-  name: $PF.DT.STRING,
-  age: $PF.DT.NUMBER,
-  others: new $PF.Params({
-    address: $PF.DT.STRING
-  })
-}, $PF.DT.NUMBER]);
-
-var data = paramsObj.filter([{
-  name: 'frank',
-  age: '28',
-  favs: ['movie', 'music', 'book'],
-  spec: 'web',
-  others: {
-    address: 'Kezhu Road 192',
-    phone: '13310010010'
-  }
-}, {
-  name: 'peggy',
-  age: 28,
-  favs: ['movie_m', 'music_m', 'book_b'],
-  spec: 'design',
-  others: {
-    address: 'Kezhu Road 192',
-    phone: '13310010011'
-  }
-}, '2']);
-
-console.log(data);
-
-
+})();
