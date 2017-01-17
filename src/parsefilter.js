@@ -120,3 +120,43 @@
   };
 
 })();
+
+// 定义一个复杂 Array 数据集
+var paramsObj = new $PF.Params([{
+  name: $PF.DT.STRING,
+  age: $PF.DT.NUMBER,
+  favs: $PF.DT.ARRAY,
+  others: new $PF.Params({
+    address: $PF.DT.STRING,
+    phone: $PF.DT.NUMBER
+  })
+}, {
+  name: $PF.DT.STRING,
+  age: $PF.DT.NUMBER,
+  others: new $PF.Params({
+    address: $PF.DT.STRING
+  })
+}, $PF.DT.NUMBER]);
+
+// 过滤数据
+var data = paramsObj.filter([{
+  name: 'frank',
+  age: '28',
+  favs: ['movie', 'music', 'book'],
+  spec: 'web',
+  others: {
+    address: 'Kezhu Road 192',
+    phone: '13310010010'
+  }
+}, {
+  name: 'peggy',
+  age: 26,
+  favs: ['movie_m', 'music_m', 'book_b'],
+  spec: 'design',
+  others: {
+    address: 'Kezhu Road 192',
+    phone: '13310010011'
+  }
+}, '2']);
+
+console.log(data);
