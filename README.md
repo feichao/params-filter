@@ -25,6 +25,18 @@ ParamsUtil.DATA_TYPE = {
 };
 ```
 
+Angular 1.x如何使用？
+```
+angular.module('your app', ['pFilter'])
+    .controller('your controller', function(PFilter) {
+        // 定义数据集
+        var paramsObj = PFilter.create({...});
+
+        // 过滤数据
+        paramsObj.filter(paramsObj, data);
+    });
+```
+
 例1：
 ```
 // 定义一个 Object 数据集
